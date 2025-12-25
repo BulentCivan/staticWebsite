@@ -4,7 +4,8 @@ import ServicesClient from "./servicesClient";
 
 export const metadata: Metadata = {
   title: "Hizmetlerimiz",
-  description: "Leverage’in sunduğu yazılım geliştirme, iş süreç yönetimi, IoT ve güvenlik çözümlerini inceleyin.",
+  description:
+    "Leverage’in sunduğu yazılım geliştirme, iş süreç yönetimi, IoT ve güvenlik çözümlerini inceleyin.",
 };
 
 type ServiceItem = {
@@ -19,7 +20,7 @@ type ServiceItem = {
 };
 
 type ServicesData = {
-  nodeByUri?: {
+  servicesPage: {
     title?: string | null;
     content?: string | null;
     services?: {
@@ -33,20 +34,20 @@ type ServicesData = {
   } | null;
 };
 
+const SERVICES_PAGE_ID = 9;
+
 const QUERY = /* GraphQL */ `
-  query ServicesPage($uri: String!) {
-    nodeByUri(uri: $uri) {
-      ... on Page {
-        title
-        content
-        services {
-          service1 { title description image { node { sourceUrl altText } } }
-          service2 { title description image { node { sourceUrl altText } } }
-          service3 { title description image { node { sourceUrl altText } } }
-          service4 { title description image { node { sourceUrl altText } } }
-          service5 { title description image { node { sourceUrl altText } } }
-          service6 { title description image { node { sourceUrl altText } } }
-        }
+  query ServicesPage($id: ID!) {
+    servicesPage: page(id: $id, idType: DATABASE_ID) {
+      title
+      content
+      services {
+        service1 { title description image { node { sourceUrl altText } } }
+        service2 { title description image { node { sourceUrl altText } } }
+        service3 { title description image { node { sourceUrl altText } } }
+        service4 { title description image { node { sourceUrl altText } } }
+        service5 { title description image { node { sourceUrl altText } } }
+        service6 { title description image { node { sourceUrl altText } } }
       }
     }
   }
@@ -58,9 +59,9 @@ function stripHtml(html?: string | null) {
 }
 
 export default async function ServicesPage() {
-  const data = await wpGraphQL<ServicesData>(QUERY, { uri: "/hizmetlerimiz/" });
+  const data = await wpGraphQL<ServicesData>(QUERY, { id: SERVICES_PAGE_ID });
 
-  const page = data?.nodeByUri;
+  const page = data?.servicesPage;
   const title = page?.title ?? "Hizmetlerimiz";
 
   const introFromWp = stripHtml(page?.content);
@@ -69,6 +70,7 @@ export default async function ServicesPage() {
     "İşinize değer katan yazılım çözümleri: güvenlikten IoT’ye, performanslı uygulamalardan süreç yönetimine.";
 
   const s = page?.services ?? {};
+
   const servicesRaw: Array<ServiceItem & { key: string }> = [
     { key: "service1", ...(s.service1 ?? {}) },
     { key: "service2", ...(s.service2 ?? {}) },
@@ -82,7 +84,7 @@ export default async function ServicesPage() {
     key: it.key,
     title: (it.title ?? "").trim(),
     description: (it.description ?? "").trim(),
-    imageUrl: it.image?.node?.sourceUrl ?? undefined,
+    imageUrl: it.image?.node?.sourceUrl ?? null,
     imageAlt: it.image?.node?.altText ?? it.title ?? "Hizmet görseli",
   }));
 

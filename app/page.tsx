@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     "Leverage; yazılım geliştirme, danışmanlık ve dijital dönüşüm süreçlerinde uçtan uca çözümler sunar.",
 };
 
-type IconEdge = { node?: { sourceUrl?: string; altText?: string } };
+type IconEdge = { node?: { sourceUrl?: string | null; altText?: string | null } | null };
 
 const references = [
   { name: "Şirket A", src: "/logos/company-a.png" },
@@ -27,25 +27,23 @@ type ServiceItem = {
   image?: { node?: { sourceUrl?: string | null; altText?: string | null } | null } | null;
 };
 
+type HomeFeatureBlock = {
+  title?: string | null;
+  description?: string | null;
+  feature1Icon?: IconEdge | null;
+};
+
 type Data = {
   page: {
     title: string;
     home: {
       ozellikler?: {
-        feature1Title?: string;
-        feture1Description?: string;
-        feature1Icon?: IconEdge;
-      };
-      feature2?: {
-        feature2Title?: string;
-        deature2Description?: string;
-        feature2Icon?: IconEdge;
-      };
-      feature3?: {
-        feature3Title?: string;
-        feature3Description?: string;
-        feature3Icon?: IconEdge;
-      };
+        feature1Title?: string | null;
+        feture1Description?: string | null;
+        feature1Icon?: IconEdge | null;
+      } | null;
+      feature2?: HomeFeatureBlock | null;
+      feature3?: HomeFeatureBlock | null;
     } | null;
   } | null;
 
@@ -64,7 +62,7 @@ type Data = {
 
 const QUERY = `
 query {
-  page(id: 6, idType: DATABASE_ID) {
+  page(id: 83, idType: DATABASE_ID) {
     title
     home {
       ozellikler {
@@ -73,14 +71,14 @@ query {
         feature1Icon { node { sourceUrl altText } }
       }
       feature2 {
-        feature2Title
-        deature2Description
-        feature2Icon { node { sourceUrl altText } }
+        title
+        description
+        feature1Icon { node { sourceUrl altText } }
       }
       feature3 {
-        feature3Title
-        feature3Description
-        feature3Icon { node { sourceUrl altText } }
+        title
+        description
+        feature1Icon { node { sourceUrl altText } }
       }
     }
   }
@@ -112,28 +110,35 @@ export default async function Home() {
           title: h.ozellikler.feature1Title ?? "",
           description: h.ozellikler.feture1Description ?? "",
           iconUrl: h.ozellikler.feature1Icon?.node?.sourceUrl ?? "",
-          iconAlt: h.ozellikler.feature1Icon?.node?.altText ?? h.ozellikler.feature1Title ?? "",
+          iconAlt:
+            h.ozellikler.feature1Icon?.node?.altText ??
+            h.ozellikler.feature1Title ??
+            "",
         }
       : null,
+
     h.feature2
       ? {
-          title: h.feature2.feature2Title ?? "",
-          description: h.feature2.deature2Description ?? "",
-          iconUrl: h.feature2.feature2Icon?.node?.sourceUrl ?? "",
-          iconAlt: h.feature2.feature2Icon?.node?.altText ?? h.feature2.feature2Title ?? "",
+          title: h.feature2.title ?? "",
+          description: h.feature2.description ?? "",
+          iconUrl: h.feature2.feature1Icon?.node?.sourceUrl ?? "",
+          iconAlt: h.feature2.feature1Icon?.node?.altText ?? h.feature2.title ?? "",
         }
       : null,
+
     h.feature3
       ? {
-          title: h.feature3.feature3Title ?? "",
-          description: h.feature3.feature3Description ?? "",
-          iconUrl: h.feature3.feature3Icon?.node?.sourceUrl ?? "",
-          iconAlt: h.feature3.feature3Icon?.node?.altText ?? h.feature3.feature3Title ?? "",
+          title: h.feature3.title ?? "",
+          description: h.feature3.description ?? "",
+          iconUrl: h.feature3.feature1Icon?.node?.sourceUrl ?? "",
+          iconAlt: h.feature3.feature1Icon?.node?.altText ?? h.feature3.title ?? "",
         }
       : null,
-  ].filter(Boolean) as Array<{ title: string; description: string; iconUrl: string; iconAlt: string }>;
+  ].filter(
+    (x): x is { title: string; description: string; iconUrl: string; iconAlt: string } =>
+      !!x && x.title.trim().length > 0
+  );
 
-  // SERVICES (title + image only for homepage preview)
   const sp = data.servicesPage;
   const s = sp?.services ?? {};
   const services = [
@@ -201,11 +206,7 @@ export default async function Home() {
                 <div className="relative h-16 w-16 transition group-hover:scale-105">
                   <div className="absolute inset-0 -z-10 rounded-full bg-sky-400/15 blur-xl" />
                   {f.iconUrl ? (
-                    <img
-                      src={f.iconUrl}
-                      alt={f.iconAlt}
-                      className="h-16 w-16 rounded-full object-cover"
-                    />
+                    <img src={f.iconUrl} alt={f.iconAlt} className="h-16 w-16 rounded-full object-cover" />
                   ) : (
                     <div className="h-16 w-16 rounded-full bg-slate-100" />
                   )}
@@ -243,7 +244,6 @@ export default async function Home() {
                 href={`/services#${item.key}`}
                 className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white/70 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:shadow-md"
               >
-                {/* accent line */}
                 <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-500/60 via-sky-500/60 to-emerald-500/40" />
 
                 <div className="p-4">
@@ -268,73 +268,59 @@ export default async function Home() {
         </div>
       </section>
 
-
-{/* REFERENCES / LOGO MARQUEE */}
-<section className="mt-12">
-  <div className="flex items-end justify-between gap-4">
-    <div>
-      <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
-        Referanslarımız
-      </h2>
-      <p className="mt-2 text-sm text-slate-600">
-        Birlikte çalıştığımız markalardan bazıları.
-      </p>
-    </div>
-  </div>
-
-  <div className="relative mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white/70 shadow-sm backdrop-blur">
-    {/* fade edges */}
-    <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-white/90 to-transparent" />
-    <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-white/90 to-transparent" />
-
-    {/* track */}
-    <div
-      className="marquee-track flex w-[200%] items-center gap-10 py-6"
-      style={{
-        animation: "marquee-left 28s linear infinite",
-      }}
-    >
-      {/* first set */}
-      <div className="flex w-1/2 items-center gap-10">
-        {references.map((logo) => (
-          <div
-            key={`a-${logo.name}`}
-            className="flex h-14 items-center justify-center rounded-xl border border-slate-200 bg-white px-6 shadow-sm"
-            title={logo.name}
-          >
-            <img
-              src={logo.src}
-              alt={logo.name}
-              className="h-8 w-auto opacity-80 grayscale transition hover:opacity-100 hover:grayscale-0"
-              loading="lazy"
-            />
+      {/* REFERENCES / LOGO MARQUEE */}
+      <section className="mt-12">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight text-slate-900">Referanslarımız</h2>
+            <p className="mt-2 text-sm text-slate-600">Birlikte çalıştığımız markalardan bazıları.</p>
           </div>
-        ))}
-      </div>
+        </div>
 
-      {/* second set (duplicate for seamless loop) */}
-      <div className="flex w-1/2 items-center gap-10">
-        {references.map((logo) => (
+        <div className="relative mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white/70 shadow-sm backdrop-blur">
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-white/90 to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-white/90 to-transparent" />
+
           <div
-            key={`b-${logo.name}`}
-            className="flex h-14 items-center justify-center rounded-xl border border-slate-200 bg-white px-6 shadow-sm"
-            title={logo.name}
+            className="marquee-track flex w-[200%] items-center gap-10 py-6"
+            style={{ animation: "marquee-left 28s linear infinite" }}
           >
-            <img
-              src={logo.src}
-              alt={logo.name}
-              className="h-8 w-auto opacity-80 grayscale transition hover:opacity-100 hover:grayscale-0"
-              loading="lazy"
-            />
+            <div className="flex w-1/2 items-center gap-10">
+              {references.map((logo) => (
+                <div
+                  key={`a-${logo.name}`}
+                  className="flex h-14 items-center justify-center rounded-xl border border-slate-200 bg-white px-6 shadow-sm"
+                  title={logo.name}
+                >
+                  <img
+                    src={logo.src}
+                    alt={logo.name}
+                    className="h-8 w-auto opacity-80 grayscale transition hover:opacity-100 hover:grayscale-0"
+                    loading="lazy"
+                  />
+                </div>
+              ))}
+            </div>
+
+            <div className="flex w-1/2 items-center gap-10">
+              {references.map((logo) => (
+                <div
+                  key={`b-${logo.name}`}
+                  className="flex h-14 items-center justify-center rounded-xl border border-slate-200 bg-white px-6 shadow-sm"
+                  title={logo.name}
+                >
+                  <img
+                    src={logo.src}
+                    alt={logo.name}
+                    className="h-8 w-auto opacity-80 grayscale transition hover:opacity-100 hover:grayscale-0"
+                    loading="lazy"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
-        ))}
-      </div>
-    </div>
-  </div>
-</section>
-
-
-      
+        </div>
+      </section>
     </main>
   );
 }

@@ -9,21 +9,19 @@ export const metadata: Metadata = {
 };
 
 type Data = {
-  nodeByUri: {
-    __typename: "Page";
+  page: {
     title?: string | null;
     content?: string | null;
   } | null;
 };
 
+const ABOUT_PAGE_ID = 14;
+
 const QUERY = `
-query {
-  nodeByUri(uri: "/hakkimizda/") {
-    __typename
-    ... on Page {
-      title
-      content
-    }
+query AboutPage($id: ID!) {
+  page(id: $id, idType: DATABASE_ID) {
+    title
+    content
   }
 }
 `;
@@ -44,8 +42,8 @@ const values = [
 ] as const;
 
 export default async function AboutUsPage() {
-  const data = await wpGraphQL<Data>(QUERY);
-  const page = data.nodeByUri && data.nodeByUri.__typename === "Page" ? data.nodeByUri : null;
+  const data = await wpGraphQL<Data>(QUERY, { id: ABOUT_PAGE_ID });
+  const page = data.page;
 
   return (
     <main className="relative">
