@@ -1,0 +1,12 @@
+services:
+  web:
+    build:
+      context: .
+      args:
+        WORDPRESS_GRAPHQL_URL: "https://wpdemo.birbulabilsem.com/index.php?graphql"
+    ports:
+      - "3000:3000"
+    environment:
+      WORDPRESS_GRAPHQL_URL: "https://wpdemo.birbulabilsem.com/index.php?graphql"
+      NODE_TLS_REJECT_UNAUTHORIZED: "0"
+    restart: unless-stopped
