@@ -95,7 +95,6 @@ export default async function ContactPage() {
                   <p className="mt-2 text-sm font-semibold text-slate-900 group-hover:text-slate-800">
                     +90 000 000 00 00
                   </p>
-                  <p className="mt-1 text-xs text-slate-600">Mesai saatlerinde</p>
                 </a>
 
                 <div className="rounded-2xl border border-slate-200 bg-white/60 p-5 shadow-sm sm:col-span-2">
@@ -143,9 +142,7 @@ export default async function ContactPage() {
                 </a>
               </div>
 
-              <p className="mt-5 text-xs text-slate-500">
-                Linkleri Footer’daki gibi buradan da güncelleyebilirsin.
-              </p>
+              
             </div>
           </div>
         </div>
