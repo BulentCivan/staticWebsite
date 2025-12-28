@@ -171,21 +171,6 @@ export default async function Home() {
               Yazılım geliştirme, danışmanlık ve dijital dönüşüm süreçlerinde uçtan uca çözümler sunuyoruz.
             </p>
           </div>
-
-          <div className="flex gap-3">
-            <Link
-              href="/services"
-              className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-slate-800"
-            >
-              Hizmetlerimiz
-            </Link>
-            <Link
-              href="/contact"
-              className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white/70 px-4 py-2 text-sm font-medium text-slate-900 shadow-sm hover:bg-white"
-            >
-              İletişim
-            </Link>
-          </div>
         </div>
 
         {/* PREMIUM FEATURE CARDS (floating icon) */}
@@ -196,7 +181,7 @@ export default async function Home() {
               className="group relative overflow-visible rounded-2xl border border-slate-200 bg-white/70 p-7 pt-12 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:shadow-md"
             >
               {/* accent line */}
-              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-500/60 via-sky-500/60 to-emerald-500/40" />
+              <div className="pointer-events-none absolute left-6 right-6 top-0 h-[6px] rounded-b-full bg-gradient-to-r from-indigo-500/60 via-sky-500/60 to-emerald-500/40" />
 
               {/* hover glow */}
               <div className="pointer-events-none absolute -inset-16 opacity-0 blur-3xl transition group-hover:opacity-100 bg-[radial-gradient(circle_at_30%_30%,rgba(99,102,241,0.18),transparent_45%),radial-gradient(circle_at_70%_60%,rgba(14,165,233,0.14),transparent_50%)]" />
